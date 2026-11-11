@@ -14,6 +14,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,13 +47,11 @@ jobs:
           retention-days: 30
 
       - name: Decode release keystore
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.KEYSTORE_BASE64 != ''
         run: echo "$KEYSTORE_BASE64" | base64 -d > release.p12
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build release APK and AAB
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.KEYSTORE_BASE64 != ''
         env:
           KEYSTORE_PATH: release.p12
           KEYSTORE_TYPE: PKCS12
@@ -62,7 +62,7 @@ jobs:
           gradle :app:assembleRelease :app:bundleRelease --no-daemon --stacktrace
 
       - name: Upload release APK
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.KEYSTORE_BASE64 != ''
         uses: actions/upload-artifact@v4
         with:
           name: iman-sangi-release-apk
@@ -70,7 +70,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload release AAB
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+        if: env.KEYSTORE_BASE64 != ''
         uses: actions/upload-artifact@v4
         with:
           name: iman-sangi-release-aab
@@ -82,10 +82,8 @@ jobs:
         run: |
           echo "### Android build" >> $GITHUB_STEP_SUMMARY
           echo "- Debug APK: app/build/outputs/apk/debug" >> $GITHUB_STEP_SUMMARY
-          if [ -n "$KEYSTORE_PRESENT" ]; then
+          if [ -n "$KEYSTORE_BASE64" ]; then
             echo "- Release artifacts were built with the configured signing secrets" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Release build skipped: KEYSTORE_BASE64 secret is not configured" >> $GITHUB_STEP_SUMMARY
           fi
-        env:
-          KEYSTORE_PRESENT: ${{ secrets.KEYSTORE_BASE64 }}
