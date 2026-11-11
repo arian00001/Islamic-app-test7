@@ -83,10 +83,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Widget taps deep-link into the customization studio. */
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val route = intent?.getStringExtra(EXTRA_ROUTE).orEmpty()
+        val route = intent.getStringExtra(EXTRA_ROUTE).orEmpty()
         if (route.isNotBlank()) webView.loadUrl(BuildConfig.WEB_APP_URL + route)
     }
 

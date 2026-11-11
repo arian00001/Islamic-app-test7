@@ -95,7 +95,7 @@ object PermissionManager {
             }
             "battery" -> Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
             "privateDns" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                Intent(Settings.ACTION_PRIVATE_DNS_SETTINGS)
+                Intent("android.settings.PRIVATE_DNS_SETTINGS")
             } else {
                 Intent(Settings.ACTION_WIRELESS_SETTINGS)
             }

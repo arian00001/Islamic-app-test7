@@ -110,7 +110,11 @@ object AppBlockingManager {
     fun recordBlock(context: Context, packageName: String) {
         scope.launch {
             AppDatabase.get(context).blockDao().insert(
-                BlockEvent(packageName, System.currentTimeMillis(), false)
+                BlockEvent(
+                    packageName = packageName,
+                    blockedAt = System.currentTimeMillis(),
+                    released = false
+                )
             )
         }
     }

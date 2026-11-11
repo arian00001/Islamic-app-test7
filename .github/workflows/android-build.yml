@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
+      # secrets cannot be read inside a step "if"; the job env can.
       KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
     steps:
       - name: Checkout
@@ -49,6 +50,8 @@ jobs:
       - name: Decode release keystore
         if: env.KEYSTORE_BASE64 != ''
         run: echo "$KEYSTORE_BASE64" | base64 -d > release.p12
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build release APK and AAB
         if: env.KEYSTORE_BASE64 != ''
@@ -82,8 +85,10 @@ jobs:
         run: |
           echo "### Android build" >> $GITHUB_STEP_SUMMARY
           echo "- Debug APK: app/build/outputs/apk/debug" >> $GITHUB_STEP_SUMMARY
-          if [ -n "$KEYSTORE_BASE64" ]; then
+          if [ -n "$KEYSTORE_PRESENT" ]; then
             echo "- Release artifacts were built with the configured signing secrets" >> $GITHUB_STEP_SUMMARY
           else
             echo "- Release build skipped: KEYSTORE_BASE64 secret is not configured" >> $GITHUB_STEP_SUMMARY
           fi
+        env:
+          KEYSTORE_PRESENT: ${{ secrets.KEYSTORE_BASE64 }}

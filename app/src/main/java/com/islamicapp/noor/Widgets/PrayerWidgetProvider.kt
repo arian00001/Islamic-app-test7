@@ -74,12 +74,31 @@ class PrayerWidgetProvider : AppWidgetProvider() {
 
     private fun hijriToday(zone: TimeZone): String {
         return try {
-            val calendar = android.icu.util.IslamicCalendar(zone, Locale.US)
-            calendar.timeInMillis = System.currentTimeMillis()
+            // Tabular Hijri conversion: no ICU dependency, identical on every device.
+            val calendar = GregorianCalendar(zone, Locale.US)
+            calendar.time = Date(System.currentTimeMillis())
+            var year = calendar.get(Calendar.YEAR)
+            var month = calendar.get(Calendar.MONTH) + 1
             val day = calendar.get(Calendar.DAY_OF_MONTH)
-            val month = calendar.get(Calendar.MONTH) + 1
-            val year = calendar.get(Calendar.YEAR)
-            day.toString() + "/" + month + "/" + year + " AH"
+            if (month < 3) {
+                year -= 1
+                month += 12
+            }
+            val a = year / 100
+            val b = 2 - a + a / 4
+            val julianDay = (365.25 * (year + 4716)).toInt() +
+                (30.6001 * (month + 1)).toInt() + day + b - 1524
+            val shift = julianDay - 1948440 + 10632
+            val cycle = (shift - 1) / 10631
+            val rest = shift - 10631 * cycle + 354
+            val jump = ((10985 - rest) / 5316) * (50 * rest / 17719) +
+                (rest / 5670) * (43 * rest / 15238)
+            val adjusted = rest - ((30 - jump) / 15) * (17719 * jump / 50) -
+                (jump / 16) * (15238 * jump / 43) + 29
+            val hijriMonth = 24 * adjusted / 709
+            val hijriDay = adjusted - 709 * hijriMonth / 24
+            val hijriYear = 30 * cycle + jump - 30
+            hijriDay.toString() + "/" + hijriMonth + "/" + hijriYear + " AH"
         } catch (e: Exception) {
             "Hijri estimate"
         }
