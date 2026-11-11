@@ -1,11 +1,14 @@
 package com.islamicapp.noor.AppBlocker
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.islamicapp.noor.BuildConfig
 import com.islamicapp.noor.MainActivity
 import com.islamicapp.noor.Quran.ListeningTracker
 import com.islamicapp.noor.R
@@ -18,63 +21,86 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+/**
+ * Shown over a blocked app. It is a WebView loading this app's own /lock page, so
+ * the lock screen is web UI like everything else: no native layout, no native
+ * dialog. The page drives it through window.NoorLock.
+ */
 class BlockedActivity : AppCompatActivity() {
 
+    private lateinit var webView: WebView
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private var ticker: Job? = null
+    private var watcher: Job? = null
+    private var blockedPackage = ""
+    private var blockedLabel = ""
 
+    inner class LockInterface {
+
+        @JavascriptInterface
+        fun unlock() {
+            AppBlockingManager.stopSession(this@BlockedActivity, emergency = true)
+            finish()
+        }
+
+        @JavascriptInterface
+        fun openApp() {
+            startActivity(
+                Intent(this@BlockedActivity, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+            finish()
+        }
+
+        @JavascriptInterface
+        fun remainingSeconds(): Long =
+            ListeningTracker.snapshot(this@BlockedActivity).optLong("remainingSeconds", 0L)
+
+        @JavascriptInterface
+        fun blockedPackage(): String = blockedPackage
+
+        @JavascriptInterface
+        fun blockedLabel(): String = blockedLabel
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_blocked)
 
-        val blockedPackage = intent.getStringExtra(EXTRA_PACKAGE).orEmpty()
-        val label = try {
+        webView = findViewById(R.id.lockWeb)
+
+        blockedPackage = intent.getStringExtra(EXTRA_PACKAGE).orEmpty()
+        blockedLabel = try {
             val info = packageManager.getApplicationInfo(blockedPackage, 0)
             packageManager.getApplicationLabel(info).toString()
         } catch (e: Exception) {
             blockedPackage
         }
 
-        findViewById<TextView>(R.id.blockedApp).text = label
+        webView.settings.javaScriptEnabled = true
+        webView.settings.domStorageEnabled = true
+        webView.webViewClient = WebViewClient()
+        webView.addJavascriptInterface(LockInterface(), "NoorLock")
+        webView.loadUrl(
+            BuildConfig.WEB_APP_URL + "/lock?pkg=" + Uri.encode(blockedPackage) +
+                "&label=" + Uri.encode(blockedLabel)
+        )
 
-        findViewById<Button>(R.id.openQuran).setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            finish()
-        }
-
-        findViewById<Button>(R.id.emergency).setOnClickListener { confirmEmergency() }
-
-        ticker = scope.launch {
+        // The session can end elsewhere (goal reached, emergency unlock, reboot).
+        watcher = scope.launch {
             while (isActive) {
                 val snapshot = ListeningTracker.snapshot(this@BlockedActivity)
-                val remaining = snapshot.optLong("remainingSeconds", 0L)
-                val text = String.format("%02d:%02d", remaining / 60, remaining % 60)
-                findViewById<TextView>(R.id.remaining).text = text
                 if (!snapshot.optBoolean("sessionActive", false)) {
                     finish()
+                    break
                 }
                 delay(1000)
             }
         }
     }
 
-    private fun confirmEmergency() {
-        AlertDialog.Builder(this)
-            .setTitle("Emergency unlock")
-            .setMessage(
-                "This stops blocking for now so you can reach anything urgent. " +
-                    "Your listening goal stays open and you can start again from the app."
-            )
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Unlock") { _, _ ->
-                AppBlockingManager.stopSession(this, emergency = true)
-                finish()
-            }
-            .show()
-    }
-
     override fun onDestroy() {
-        ticker?.cancel()
+        watcher?.cancel()
         scope.cancel()
         super.onDestroy()
     }

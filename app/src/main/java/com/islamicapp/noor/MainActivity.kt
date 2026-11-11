@@ -6,22 +6,22 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.webkit.WebView
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONObject
 
+/**
+ * The app's only screen. There is no native interface at all: this activity is a
+ * full-screen WebView and every feature - navigation, loading states, offline
+ * banners, dialogs, the lock screen - is rendered by the web app. Native code
+ * exists only behind bridge methods.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private lateinit var bridge: WebAppBridge
-    private lateinit var progress: ProgressBar
-    private lateinit var offlinePanel: LinearLayout
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -36,18 +36,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         webView = findViewById(R.id.webview)
-        progress = findViewById(R.id.progress)
-        offlinePanel = findViewById(R.id.offlinePanel)
 
         NoorApp.init(this)
         bridge = WebAppBridge(this, webView)
         EventBus.attach { type, data -> bridge.emitEvent(type, data) }
         WebViewManager.configure(webView, bridge, this)
-
-        findViewById<Button>(R.id.retry).setOnClickListener {
-            offlinePanel.visibility = View.GONE
-            webView.reload()
-        }
 
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState)
@@ -61,18 +54,6 @@ class MainActivity : AppCompatActivity() {
                 if (webView.canGoBack()) webView.goBack() else finish()
             }
         })
-    }
-
-    fun setLoading(show: Boolean) {
-        progress.visibility = if (show) View.VISIBLE else View.GONE
-    }
-
-    fun setProgress(value: Int) {
-        progress.progress = value.coerceIn(0, 100)
-    }
-
-    fun showOffline(show: Boolean) {
-        offlinePanel.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     fun isOnline(): Boolean {

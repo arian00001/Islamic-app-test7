@@ -43,11 +43,10 @@ object WebViewManager {
         webView.webViewClient = object : WebViewClient() {
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
-                activity.setLoading(true)
+                // No native loading bar: the web app shows its own.
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
-                activity.setLoading(false)
                 bridge.onPageReady()
             }
 
@@ -56,8 +55,11 @@ object WebViewManager {
                 request: WebResourceRequest?,
                 error: WebResourceError?
             ) {
-                if (request?.isForMainFrame == true && !activity.isOnline()) {
-                    activity.showOffline(true)
+                if (request?.isForMainFrame == true) {
+                    val event = JSONObject()
+                    event.put("online", activity.isOnline())
+                    event.put("url", request.url.toString())
+                    EventBus.emitJson("network", event)
                 }
             }
 

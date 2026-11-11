@@ -1,59 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- The block screen is a WebView showing the app's own /lock page. -->
+<WebView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lockWeb"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/brand_deep"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="28dp">
-
-    <TextView
-        android:id="@+id/blockedApp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/lime"
-        android:textSize="13sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/blocked_title"
-        android:textColor="@color/white"
-        android:textSize="24sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:text="@string/blocked_body"
-        android:textColor="@color/paper"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/remaining"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
-        android:textColor="@color/lime"
-        android:textSize="30sp" />
-
-    <Button
-        android:id="@+id/openQuran"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
-        android:backgroundTint="@color/lime"
-        android:text="@string/blocked_open_quran"
-        android:textColor="@color/brand_deep" />
-
-    <Button
-        android:id="@+id/emergency"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="@color/brand"
-        android:text="@string/blocked_emergency"
-        android:textColor="@color/paper" />
-</LinearLayout>
+    android:overScrollMode="never" />

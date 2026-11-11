@@ -31,11 +31,23 @@ The debug APK lands in app/build/outputs/apk/debug/.
 Push the project to a repository. Every push and pull request builds a debug APK
 and uploads it as an artifact. Manual runs use workflow_dispatch.
 
-Optional release signing secrets (Settings > Secrets and variables > Actions):
+The release key made for this app lives in the admin panel (Android source >
+Signing key): download noor-release.p12 and keystore.properties. Both are
+git-ignored - keep them out of the repository and never publish them.
 
-    KEYSTORE_BASE64      base64 of your .jks file
+For a local signed build put keystore.properties next to settings.gradle.kts:
+
+    storeFile=noor-release.p12
+    storeType=PKCS12
+    storePassword=...
+    keyAlias=noor
+    keyPassword=...
+
+GitHub Actions signing secrets (Settings > Secrets and variables > Actions):
+
+    KEYSTORE_BASE64      base64 of noor-release.p12
     KEYSTORE_PASSWORD    keystore password
-    KEY_ALIAS            key alias
+    KEY_ALIAS            noor
     KEY_PASSWORD         key password
 
 Without those secrets the workflow still builds a debug APK and clearly reports
@@ -43,7 +55,7 @@ that the release build was skipped. It never claims a release it did not build.
 
 Create the base64 value with:
 
-    base64 -w 0 release.jks > keystore.txt
+    base64 -w 0 noor-release.p12 > keystore.txt
 
 ## Web app integration
 
