@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Iman Sangi</string>
+    <string name="accessibility_label">Iman Sangi App Focus</string>
+    <string name="accessibility_description">Blocks the apps you selected until your Quran listening goal is complete.</string>
+    <string name="channel_quran">Quran playback</string>
+    <string name="channel_adhan">Adhan and prayer alarms</string>
+    <string name="channel_focus">Focus sessions</string>
+    <string name="channel_protection">Protection status</string>
+    <string name="blocked_title">This app is blocked</string>
+    <string name="blocked_body">Listen to the required Quran time to unlock your apps.</string>
+    <string name="blocked_remaining">Remaining listening time</string>
+    <string name="blocked_open_quran">Open Quran</string>
+    <string name="blocked_emergency">Emergency unlock</string>
+</resources>
