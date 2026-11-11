@@ -165,12 +165,12 @@ class WebAppBridge(
 
             // ---------- SOUND ----------
             "setRingtone" -> {
-                AppPreferences.setRingtone(activity, p.optString("soundUri", ""))
+                AppPreferences.setRingtone(p.optString("soundUri", ""))
                 JSONObject().put("saved", true)
             }
             "previewSound" -> JSONObject().put("played", AppNotifications.preview(activity, p.optString("soundUri", "")))
             "setVibration" -> {
-                AppPreferences.setVibration(activity, p.optBoolean("enabled", true))
+                AppPreferences.setVibration(p.optBoolean("enabled", true))
                 JSONObject().put("saved", true)
             }
             "showNotification" -> {
@@ -193,9 +193,15 @@ class WebAppBridge(
             }
 
             // ---------- STORAGE ----------
-            "saveLocalData" -> AppPreferences.putRaw(activity, p.getString("key"), p.optString("value", ""))
-            "getLocalData" -> AppPreferences.getRaw(activity, p.getString("key"))
-            "deleteLocalData" -> AppPreferences.removeRaw(activity, p.getString("key"))
+            "saveLocalData" -> {
+                AppPreferences.putRaw(p.getString("key"), p.optString("value", ""))
+                JSONObject().put("saved", true)
+            }
+            "getLocalData" -> AppPreferences.getRaw(p.getString("key"))
+            "deleteLocalData" -> {
+                AppPreferences.removeRaw(p.getString("key"))
+                JSONObject().put("saved", true)
+            }
 
             // ---------- CUSTOMIZATION STUDIO ----------
             "requestWallpaperPermission" -> WallpaperHelper.info()

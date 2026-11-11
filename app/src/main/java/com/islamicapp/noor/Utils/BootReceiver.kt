@@ -7,6 +7,7 @@ import com.islamicapp.noor.AppBlocker.AppBlockingManager
 import com.islamicapp.noor.Focus.FocusTimerManager
 import com.islamicapp.noor.NoorApp
 import com.islamicapp.noor.Prayer.AdhanAlarmManager
+import com.islamicapp.noor.Widgets.WidgetUpdater
 
 /**
  * Restores what Android allows after a reboot: saved sessions and schedules.
@@ -22,5 +23,7 @@ class BootReceiver : BroadcastReceiver() {
         AppBlockingManager.restoreAfterReboot(context)
         FocusTimerManager.restoreAfterReboot(context)
         AdhanAlarmManager.rescheduleAll(context)
+        WidgetUpdater.refreshAll(context)
+        WidgetUpdater.ensureScheduled(context)
     }
 }
