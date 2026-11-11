@@ -22,7 +22,7 @@ object ThemeExchange {
         require(json.isNotBlank()) { "Nothing to import" }
         val parsed = JSONObject(json)
         require(parsed.has("themeId") || parsed.has("tokens") || parsed.has("name")) {
-            "This is not an Iman Sangi theme file"
+            "This is not a Noor theme file"
         }
         return parsed
     }

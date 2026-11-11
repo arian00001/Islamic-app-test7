@@ -100,7 +100,7 @@ object AppNotifications {
             }
             manager?.createNotificationChannel(channel)
         }
-        show(context, "It is time for " + prayer.replaceFirstChar { it.uppercase() }, "Tap to open Iman Sangi", channelId)
+        show(context, "It is time for " + prayer.replaceFirstChar { it.uppercase() }, "Tap to open Noor", channelId)
     }
 
     fun blockingStarted(context: Context, minutes: Int) {

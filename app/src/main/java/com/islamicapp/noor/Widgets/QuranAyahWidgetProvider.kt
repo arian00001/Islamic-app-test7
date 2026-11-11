@@ -63,7 +63,7 @@ class QuranAyahWidgetProvider : AppWidgetProvider() {
         views.setTextViewText(
             R.id.widgetTranslation,
             ayah?.optString("translation", "")?.takeIf { it.isNotBlank() }
-                ?: "Open Iman Sangi -> Customize -> Widget Studio"
+                ?: "Open Noor -> Customize -> Widget Studio"
         )
         views.setTextViewText(R.id.widgetReference, ayah?.optString("reference", "") ?: "")
 

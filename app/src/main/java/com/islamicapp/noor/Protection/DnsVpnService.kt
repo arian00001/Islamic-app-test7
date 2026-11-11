@@ -39,7 +39,7 @@ class DnsVpnService : VpnService() {
 
     private fun startTunnel() {
         val builder = Builder()
-            .setSession("Iman Sangi protection")
+            .setSession("Noor protection")
             .addAddress(TUN_ADDRESS, 32)
             .addDnsServer(DNS_IN_TUNNEL)
             .addRoute(DNS_IN_TUNNEL, 32)

@@ -176,7 +176,7 @@ class WebAppBridge(
             "showNotification" -> {
                 AppNotifications.show(
                     activity,
-                    title = p.optString("title", "Iman Sangi"),
+                    title = p.optString("title", "Noor"),
                     body = p.optString("body", ""),
                     channelId = p.optString("channelId", AppNotifications.CHANNEL_GENERAL)
                 )

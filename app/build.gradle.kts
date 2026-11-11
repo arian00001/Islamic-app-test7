@@ -39,6 +39,8 @@ android {
     signingConfigs {
         if (keystorePath != null) {
             create("release") {
+                // Relative keystore paths resolve against the repository root, which is
+                // where keystore.properties and the CI-decoded .p12 both live.
                 storeFile = rootProject.file(keystorePath)
                 storePassword = signingValue("storePassword", "KEYSTORE_PASSWORD")
                 keyAlias = signingValue("keyAlias", "KEY_ALIAS")
