@@ -5,6 +5,7 @@ import android.webkit.WebView
 import com.islamicapp.noor.AppBlocker.AppBlockingManager
 import com.islamicapp.noor.AppBlocker.AppUsageStats
 import com.islamicapp.noor.Customization.DeviceExtras
+import com.islamicapp.noor.Customization.LauncherManager
 import com.islamicapp.noor.Customization.ShortcutHelper
 import com.islamicapp.noor.Customization.ThemeExchange
 import com.islamicapp.noor.Customization.WallpaperHelper
@@ -238,6 +239,13 @@ class WebAppBridge(
             "cancelPrayerNotification" -> AdhanAlarmManager.cancel(activity, p.optString("prayer", "fajr"))
             "exportTheme" -> ThemeExchange.export(activity, p.optJSONObject("payload") ?: JSONObject())
             "importTheme" -> ThemeExchange.importTheme(p.optString("json", ""))
+
+            // ---------- LAUNCHER ----------
+            "getLauncherApps" -> LauncherManager.apps(activity)
+            "launchApp" -> LauncherManager.launch(activity, p.optString("packageName", ""))
+            "isDefaultLauncher" -> LauncherManager.status(activity)
+            "requestDefaultLauncher" -> LauncherManager.requestDefault(activity)
+            "openLauncherHome" -> LauncherManager.openHome(activity)
 
             // ---------- SYSTEM ----------
             "openAndroidSettings" -> PermissionManager.openSettings(activity, p.optString("target", "app"))
