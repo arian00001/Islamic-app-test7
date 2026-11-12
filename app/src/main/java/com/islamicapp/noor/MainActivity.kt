@@ -23,6 +23,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var bridge: WebAppBridge
 
+    /** True when Android started this activity as the device home screen. */
+    private var launchedAsHome = false
+
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -42,16 +45,24 @@ class MainActivity : AppCompatActivity() {
         EventBus.attach { type, data -> bridge.emitEvent(type, data) }
         WebViewManager.configure(webView, bridge, this)
 
+        launchedAsHome = intent?.hasCategory(Intent.CATEGORY_HOME) == true
+
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState)
         } else {
-            val route = intent?.getStringExtra(EXTRA_ROUTE).orEmpty()
+            val route = intent?.getStringExtra(EXTRA_ROUTE)
+                ?: if (launchedAsHome) LAUNCHER_ROUTE else ""
             webView.loadUrl(BuildConfig.WEB_APP_URL + route)
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (webView.canGoBack()) webView.goBack() else finish()
+                when {
+                    webView.canGoBack() -> webView.goBack()
+                    // A home app never closes on back: it just steps aside.
+                    launchedAsHome -> moveTaskToBack(true)
+                    else -> finish()
+                }
             }
         })
     }
@@ -98,5 +109,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ROUTE = "noor_route"
+        const val LAUNCHER_ROUTE = "/launcher"
     }
 }
