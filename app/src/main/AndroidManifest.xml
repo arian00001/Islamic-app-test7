@@ -51,10 +51,18 @@
             android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
             android:exported="true"
             android:launchMode="singleTask"
+            android:stateNotNeeded="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Home app: lets the user pick Noor as the device launcher so the
+                 WebView home screen renders the app drawer. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
