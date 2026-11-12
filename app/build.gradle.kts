@@ -27,8 +27,8 @@ android {
         applicationId = "com.islamicapp.noor"
         minSdk = 24
         targetSdk = 34
-        versionCode = 14
-        versionName = "1.3.0"
+        versionCode = 15
+        versionName = "1.3.1"
         vectorDrawables.useSupportLibrary = true
 
         // The live Iman Sangi web app this shell loads. Change it here if you move
